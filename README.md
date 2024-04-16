@@ -1,3 +1,5 @@
+Este proyecto donde se creo un tipo de encriptación inventado, el cual esta realizado por fastapi
+
 Por si se quiere ejecutar se necesita tener instalado lo siguiente
 
 pip install virtualenv 

@@ -97,10 +97,21 @@ def get_db():
     finally:
         db.close()  
 
-#utilizar el metodo html con templates
+#plantilla de login/inicio
 @app.get("/", response_class=HTMLResponse) #para ir al modelo de ingreso
-def template(response: Response, request: Request):
+def template(request: Request):
     return templates.TemplateResponse("item.html", {"request": request})
+#función para ingresar al sistema
+@app.post("/")
+async def login(request: Request, 
+                db: Session = Depends(get_db), 
+                username: str = Form(...), 
+                password: str = Form(...)):
+    print("usuario:", username)
+    print("contraseña:", password)
+    
+    return templates.TemplateResponse("ingreso.html", {"request": request})
+    
 
 
 #plantilla de registro
@@ -109,7 +120,7 @@ def registro(
     request: Request,
     ):
     return templates.TemplateResponse("registro.html", {"request": request})
-
+#fucnón para registrar los datos a la hora de la creación del usuario
 @app.post('/registro', response_model=schemas.Crear_Usuario)
 async def registro(request: Request, 
                    username: str = Form(...), 

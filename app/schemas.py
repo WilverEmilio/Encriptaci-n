@@ -8,7 +8,7 @@ class Datos(BaseModel):
     correo_electronico: str
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         
 class Crear_Usuario(BaseModel):
     usuario: str
@@ -16,11 +16,11 @@ class Crear_Usuario(BaseModel):
     correo_electronico: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         
 class Ingreso(BaseModel):
     usuario: str
     contrasena: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -211,4 +211,3 @@ async def registro(request: Request,
     print("correo:", email)
     
     return templates.TemplateResponse("item.html", {"request": request})
-

@@ -90,6 +90,46 @@ def generar_contrasena_aleatoria(texto):
             continue
     return contrasena_aleatoria
 
+def decodificar_contrasena(contrasena_texto):
+    contrasena_decodificada = []
+    letras_acumuladas = ""
+    
+    palabras_numeros = {
+        "cero": 0,
+        "uno": 1,
+        "dos": 2,
+        "tres": 3,
+        "cuatro": 4,
+        "cinco": 5,
+        "seis": 6,
+        "siete": 7,
+        "ocho": 8,
+        "nueve": 9
+    }
+
+    for caracter in contrasena_texto:
+        if caracter.isalpha():
+            letras_acumuladas += caracter
+            if letras_acumuladas.lower() in [palabra.lower() for palabras in palabras_por_letra.values() for palabra in palabras]:
+                letra = [letra for letra, palabras in palabras_por_letra.items() if letras_acumuladas.lower() in [palabra.lower() for palabra in palabras]][0]
+                contrasena_decodificada.append(letra)
+                letras_acumuladas = ""
+            elif letras_acumuladas.lower() in palabras_numeros:
+                contrasena_decodificada.append(palabras_numeros[letras_acumuladas.lower()])
+                letras_acumuladas = ""
+        else:
+            if letras_acumuladas:
+                contrasena_decodificada.append("?")
+                letras_acumuladas = ""
+
+            if caracter.isdigit():
+                contrasena_decodificada.append(int(caracter))
+
+    if letras_acumuladas:
+        contrasena_decodificada.append("?")
+
+    return contrasena_decodificada
+
 def get_db():
     db = SessionLocal()
     try:
@@ -107,12 +147,31 @@ async def login(request: Request,
                 db: Session = Depends(get_db), 
                 username: str = Form(...), 
                 password: str = Form(...)):
-    print("usuario:", username)
-    print("contraseña:", password)
+    user = db.query(models.Registr).filter(models.Registr.usuario == username).first()
     
-    return templates.TemplateResponse("ingreso.html", {"request": request})
-    
-
+    if user:
+        user_password = user.contrasena
+        bytes_object = bytes.fromhex(user_password)
+        text = bytes_object.decode("utf-8")
+        
+        text_min = text.lower()
+        
+        password_decoded = decodificar_contrasena(text_min)
+        
+        password_decoded_str = ''.join(str(elemento) for elemento in password_decoded)
+        
+        pass_min = password.lower()
+        
+        print("La contraseña en hexadecimal es: ", user_password)
+        print("La contraseña en texto es: ", text)
+        print("La cadena en minusculas es: ", text_min)
+        print("La contrasñea decodificada es: ", password_decoded)
+        
+        if pass_min == password_decoded_str :
+                return templates.TemplateResponse("ingreso.html", {"request": request})
+        else: 
+            return templates.TemplateResponse("item.html", {"request": request})
+        
 
 #plantilla de registro
 @app.get("/registro", response_class=HTMLResponse)
